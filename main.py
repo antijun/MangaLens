@@ -12,6 +12,10 @@ from typesetting import overlay_translated_text
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+def display_translated_image(img_path):
+    img = Image.open(img_path)
+    img.show()
+
 def process_translation_to_csv(csv_file_path, ocr_results, bounding_boxes):
     # Replace the CSV file if it already exists
     with open(csv_file_path, "w", newline="", encoding="utf-8") as csv_file:
@@ -87,7 +91,9 @@ def main(img_path):
     print("\n--- OCR and Translation Results ---")
     print(f"Translations saved to: {output_csv_file}")
     print(f"Translated Image Saved to: {output_text_overlay_path}")
-
+    
+    display_translated_image(output_text_overlay_path)
+    
 if __name__ == "__main__":
     img_path = "test_panels/mushoku3.jpg"
     main(img_path)
