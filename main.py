@@ -1,7 +1,10 @@
 import os
 import sys
 import csv
+import io 
+import numpy as np
 from ocr import OCR
+from PIL import Image
 from image_processing.text_segmentation import TextSegmentation
 from image_processing.text_bounding import TextBounding
 from translation.deepl import translate_deepl
@@ -21,29 +24,31 @@ def process_translation_to_csv(csv_file_path, ocr_results, bounding_boxes):
     # Process each cropped region for OCR and translation
     with open(csv_file_path, "a", newline="", encoding="utf-8") as csv_file:
         writer = csv.writer(csv_file)
-        for ocr_file, (x, y, w, h) in zip(ocr_results, bounding_boxes):
+        for ocr_image, (x, y, w, h) in zip(ocr_results, bounding_boxes):
             # Skip invalid bounding boxes
             if w <= 0 or h <= 0:
                 print(f"Skipping invalid bounding box: x={x}, y={y}, w={w}, h={h}")
                 continue
 
+            # Convert numpy.ndarray to PIL.Image
+            if isinstance(ocr_image, np.ndarray):
+                ocr_image = Image.fromarray(ocr_image)
+
             # Extract text using OCR
-            original_text = ocr.extract_text(ocr_file)
+            original_text = ocr.extract_text(ocr_image)
 
             # Translate the text using DeepL
             translated_text = translate_deepl(original_text)
 
             # Write the original and translated text, and bounding box to the CSV file
             writer.writerow([original_text, str(translated_text), x, y, w, h])
-            print(f"Processed and added translation for {ocr_file} to CSV.")
-
+            print(f"Processed and added translation for bounding box {x}, {y}, {w}, {h} to CSV.")
 
 def main(img_path):
     # Define paths
     image_name = os.path.splitext(os.path.basename(img_path))[0]
     output_inpainted_dir = "output/inpainted/"
     output_text_only_dir = "output/text_only/"
-    output_ocr_dir = "output/ocr/"
     output_boxed_dir = "output/boxed/"
     output_csv_file = f"output/{image_name}_translations.csv"
     output_text_overlay_path = f"output/{image_name}_translated.png"
@@ -51,7 +56,6 @@ def main(img_path):
     # Ensure output directories exist
     os.makedirs(output_inpainted_dir, exist_ok=True)
     os.makedirs(output_text_only_dir, exist_ok=True)
-    os.makedirs(output_ocr_dir, exist_ok=True)
     os.makedirs(output_boxed_dir, exist_ok=True)
 
     # Initialize the TextSegmentation class
@@ -64,7 +68,7 @@ def main(img_path):
     text_bounding = TextBounding()
 
     # Process the text-only image for OCR bounding
-    ocr_results = text_bounding.process_text_regions(text_only_path, output_ocr_dir)
+    ocr_results = text_bounding.process_text_regions(text_only_path)
 
     # Draw and save boxes around detected text regions
     text_bounding.draw_boxes(text_only_path, output_boxed_dir)
@@ -85,5 +89,5 @@ def main(img_path):
     print(f"Translated Image Saved to: {output_text_overlay_path}")
 
 if __name__ == "__main__":
-    img_path = "test_panels/mushoku2.jpg"
+    img_path = "test_panels/mushoku21.jpg"
     main(img_path)

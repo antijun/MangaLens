@@ -1,5 +1,6 @@
 import os
 import cv2
+import tempfile
 from tqdm import tqdm
 
 class TextBounding:
@@ -29,22 +30,19 @@ class TextBounding:
         bounding_boxes = [cv2.boundingRect(cnt) for cnt in contours]
         return bounding_boxes
 
-    def crop_and_save_regions(self, img, bounding_boxes, output_dir):
-        """Crop bounding regions and save them to output directory."""
-        os.makedirs(output_dir, exist_ok=True)
+    def crop_regions(self, img, bounding_boxes):
+        """Crop bounding regions and return them as in-memory images."""
         cropped_images = []
-        for i, (x, y, w, h) in enumerate(bounding_boxes):
-            cropped = img[y:y+h, x:x+w]
-            output_path = os.path.join(output_dir, f"region_{i + 1}.png")
-            cv2.imwrite(output_path, cropped)
-            cropped_images.append(output_path)
+        for (x, y, w, h) in bounding_boxes:
+            cropped = img[y:y + h, x:x + w]
+            cropped_images.append(cropped)
         return cropped_images
 
-    def process_text_regions(self, img_path, output_dir):
-        """Detect, crop, and process text regions."""
+    def process_text_regions(self, img_path):
+        """Detect and process text regions without saving cropped regions."""
         img = cv2.imread(img_path)
         bounding_boxes = self.detect_text_regions(img_path)
-        cropped_images = self.crop_and_save_regions(img, bounding_boxes, output_dir)
+        cropped_images = self.crop_regions(img, bounding_boxes)
         return cropped_images
 
     def draw_boxes(self, img_path, output_dir):
