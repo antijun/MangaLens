@@ -89,5 +89,5 @@ def main(img_path):
     print(f"Translated Image Saved to: {output_text_overlay_path}")
 
 if __name__ == "__main__":
-    img_path = "test_panels/mushoku21.jpg"
+    img_path = "test_panels/mushoku3.jpg"
     main(img_path)
