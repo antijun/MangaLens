@@ -95,5 +95,5 @@ def main(img_path):
     display_translated_image(output_text_overlay_path)
     
 if __name__ == "__main__":
-    img_path = "backend/test_panels/mushoku3.jpg"
+    img_path = "backend/test_panels/mushoku21.jpg"
     main(img_path)
