@@ -8,5 +8,15 @@ auth_key = os.getenv("DEEPL_KEY")
 translator = deepl.Translator(auth_key)
 
 def translate_deepl(text):
-    translation = translator.translate_text(text, target_lang='EN-US')
-    return translation
+    # Skip translation if empty text
+    if not text or text.strip() == '':
+        return ''
+    
+    try:
+        translation = translator.translate_text(text, target_lang='EN-US')
+        # Return as string to ensure serialization works
+        return str(translation)
+    except Exception as e:
+        print(f"Translation error: {str(e)}")
+        # Return original text if translation fails
+        return text

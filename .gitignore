@@ -1,1 +1,13 @@
 .env
+output/
+
+# pycache
+__pycache__/
+
+# venv
+venv/
+
+# node_modules
+node_modules/
+
+test_panels/

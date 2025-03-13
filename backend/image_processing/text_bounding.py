@@ -8,7 +8,7 @@ class TextBounding:
         pass
 
     def detect_text_regions(self, img_path, contour_size=0.01):
-        """Detect text regions and return bounding boxes."""
+        """Detect text regions and return bounding boxes in manga reading order (right-to-left, top-to-bottom)."""
         img = cv2.imread(img_path)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -28,7 +28,37 @@ class TextBounding:
 
         # Bounding boxes
         bounding_boxes = [cv2.boundingRect(cnt) for cnt in contours]
-        return bounding_boxes
+        
+        # Sort bounding boxes in manga reading order (right-to-left, top-to-bottom)
+        # First, define manga panels by grouping text bubbles by rows
+        row_height = sum([h for _, _, _, h in bounding_boxes]) / max(1, len(bounding_boxes))
+        row_tolerance = row_height * 0.7  # Tolerance for grouping text in the same row
+        
+        # Group bounding boxes by row based on vertical position
+        rows = {}
+        for box in bounding_boxes:
+            x, y, w, h = box
+            # Find which row this box belongs to
+            assigned = False
+            for row_y in rows.keys():
+                if abs(y - row_y) < row_tolerance:
+                    rows[row_y].append(box)
+                    assigned = True
+                    break
+            if not assigned:
+                rows[y] = [box]
+        
+        # Sort rows by y-coordinate (top to bottom)
+        sorted_rows = sorted(rows.items(), key=lambda item: item[0])
+        
+        # For each row, sort boxes from right to left
+        manga_ordered_boxes = []
+        for _, boxes in sorted_rows:
+            # Sort boxes in this row from right to left
+            right_to_left_boxes = sorted(boxes, key=lambda box: -box[0])  # Negative x to sort right-to-left
+            manga_ordered_boxes.extend(right_to_left_boxes)
+        
+        return manga_ordered_boxes
 
     def crop_regions(self, img, bounding_boxes):
         """Crop bounding regions and return them as in-memory images."""

@@ -1,0 +1,18 @@
+Flask==2.2.3
+flask-cors==3.0.10
+Pillow==9.4.0
+numpy==1.24.2
+werkzeug==2.2.3
+python-dotenv==1.0.0
+# These are placeholders based on imports in your code
+# You may need to adjust versions based on your existing environment
+# deepl dependency (assuming you're using the official API)
+deepl==1.14.0
+manga-ocr
+opencv-python
+tensorflow
+funcy
+PyQt5
+imageio
+gunicorn==21.2.0
+openai==1.3.0
