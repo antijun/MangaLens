@@ -16,7 +16,7 @@ A web application for translating manga panels and pages automatically. The app 
 
 ### Backend
 - Python Flask for RESTful API
-- OpenAI for OCR and translation assistance
+- MangaOCR for OCR
 - DeepL for translation
 - SickZil-Machine for text segmentation
 - Pillow for image processing
@@ -74,7 +74,6 @@ manga-translator/
 
 3. Create a `.env` file in the backend directory with your API keys:
    ```
-   OPENAI_API_KEY=your_openai_api_key
    DEEPL_KEY=your_deepl_api_key
    ```
 
@@ -85,11 +84,6 @@ manga-translator/
    python app.py
    ```
    
-   **Simplified version** (no SickZil-Machine dependency):
-   ```
-   python simplified_app.py
-   ```
-
 ### Frontend Setup
 1. Install dependencies:
    ```
@@ -103,18 +97,6 @@ manga-translator/
    ```
 
 3. Open your browser and navigate to `http://localhost:5173`
-
-## Running with the Simplified Backend
-
-If you encounter issues with SickZil-Machine dependency, you can use the simplified version of the backend that bypasses the text segmentation step:
-
-1. Run the simplified backend:
-   ```
-   cd backend
-   python simplified_app.py
-   ```
-
-2. The simplified version doesn't have text detection but allows you to test the upload, translation, and UI functionality.
 
 ## Troubleshooting
 
